@@ -1,0 +1,34 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  row-gap: var(--size-4);
+}
+
+.list-row {
+  background-color: var(--item-background, transparent);
+  border: 1px solid var(--item-border-color, var(--color-border));
+  border-radius: var(--rounded-lg);
+  font-size: var(--text-sm);
+  padding: var(--size-4);
+}
+
+.list-row--muted {
+  --item-background: rgb(from var(--color-border-light) r g b / .5);
+}
+
+.list-row--borderless {
+  --item-border-color: transparent;
+}
+
+.list-row--link:hover {
+  --item-background: rgb(from var(--color-border-light) r g b / .5);
+}
+
+.list-row--link:focus-visible {
+  outline: 2px solid var(--color-selected-dark);
+}
+
+.list-row--check:has(:checked) {
+  --item-background: rgb(from var(--color-border-light) r g b / .5);
+  --item-border-color: var(--color-primary);
+}

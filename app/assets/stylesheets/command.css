@@ -1,0 +1,73 @@
+.command {
+  background-color: var(--color-surface);
+  border-radius: var(--rounded-lg);
+  border-width: var(--border);
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  flex-direction: column;
+}
+
+.command__input {
+  --input-background: transparent;
+  --input-border-color: transparent;
+  --input-box-shadow: none;
+  --input-outline-size: 0;
+  --input-padding: var(--size-2_5);
+}
+
+.command__list {
+  border-block-start-width: var(--border);
+  max-block-size: 300px;
+  overflow-y: auto;
+
+  &:not(:has(.command__item:not([hidden]))) {
+    display: none;
+  }
+}
+
+.command__group:not(:first-child) {
+  border-block-start-width: var(--border);
+}
+
+.command__group {
+  display: flex;
+  flex-direction: column;
+  padding: var(--size-1);
+  row-gap: 1px;
+
+  &:not(:has(.command__item:not([hidden]))) {
+    display: none;
+  }
+}
+
+.command__group-header {
+  color: var(--color-text-subtle);
+  font-size: var(--text-xs);
+  padding: var(--size-1_5) var(--size-2);
+}
+
+.command__empty {
+  display: none;
+  font-size: var(--text-sm);
+  justify-content: center;
+  padding-block: var(--size-6);
+}
+
+.command__item {
+  --btn-border-color: transparent;
+  --btn-box-shadow: none;
+  --btn-font-weight: var(--font-normal);
+  --btn-justify-content: start;
+  --btn-outline-size: 0;
+  --btn-padding: var(--size-1_5) var(--size-2);
+
+  &[aria-selected="true"] {
+    --btn-background: var(--color-border-light);
+  }
+}
+
+.command__item-key {
+  color: var(--color-text-subtle);
+  font-size: var(--text-xs);
+  margin-inline-start: auto;
+}

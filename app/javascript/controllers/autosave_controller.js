@@ -1,0 +1,56 @@
+import { Controller } from "@hotwired/stimulus"
+import { FetchRequest } from "https://esm.sh/@rails/request.js@0.0.13?standalone"
+
+const AUTOSAVE_INTERVAL = 3000
+
+export default class extends Controller {
+  static targets = [ "submit" ]
+
+  #timer
+
+  disconnect() {
+    this.#submit()
+  }
+
+  change() {
+    !this.#dirty && this.#scheduleSaveAndUpdateAppearance(false)
+  }
+
+  async #submit() {
+    this.#dirty && await this.#save()
+  }
+
+  async #save() {
+    this.#updateAppearance(true)
+    this.#resetTimer()
+    await this.#submitForm(this.element)
+    this.#updateAppearance(false)
+  }
+
+  async #submitForm(form) {
+    return await new FetchRequest(form.method, form.action, { body: new FormData(form) }).perform()
+  }
+
+  #scheduleSaveAndUpdateAppearance(saving) {
+    this.#scheduleSave()
+    this.#updateAppearance(false)
+  }
+
+  #scheduleSave() {
+    this.#timer = setTimeout(() => this.#save(), AUTOSAVE_INTERVAL)
+  }
+
+  #updateAppearance(saving) {
+    this.element.ariaBusy = saving
+    this.submitTarget.disabled = saving
+  }
+
+  #resetTimer() {
+    clearTimeout(this.#timer)
+    this.#timer = null
+  }
+
+  get #dirty() {
+    return !!this.#timer
+  }
+}
