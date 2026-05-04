@@ -1,0 +1,20 @@
+<div id="chapter_progress">
+  <% if thesis.chapters.any? %>
+    <% total = thesis.chapters.size %>
+
+    <% if thesis.drafting? %>
+      <% drafted = thesis.chapters.where(status: :draft_complete).count %>
+      <p>Drafting chapters: <strong><%= drafted %> / <%= total %></strong></p>
+      <%= tag.progress value: drafted, max: total, class: "progress", role: "progressbar" %>
+
+    <% elsif thesis.verification? %>
+      <% verified = thesis.chapters.where(status: :verified).count %>
+      <p>Verifying chapters: <strong><%= verified %> / <%= total %></strong></p>
+      <%= tag.progress value: verified, max: total, class: "progress", role: "progressbar" %>
+
+    <% elsif thesis.complete? %>
+      <p>✅ All <%= total %> chapters verified.</p>
+      <%= tag.progress value: total, max: total, class: "progress", role: "progressbar" %>
+    <% end %>
+  <% end %>
+</div>

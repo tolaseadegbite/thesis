@@ -25,9 +25,10 @@
   </head>
 
   <body class="header-layout">
+    <%= turbo_stream_from "thesis_#{@thesis.id}" if @thesis %>
     <header id="header">
       <div class="container">
-        <h1 class="font-bold text-2xl">Thesis</h1>
+        <%= link_to "Thesis", root_path, class: "font-bold text-2xl" %>
       </div>
     </header>
 

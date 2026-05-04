@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  topic: MyText
+  status: 1
+  outline: 
+  cost_estimate: 1.5
+
+two:
+  topic: MyText
+  status: 1
+  outline: 
+  cost_estimate: 1.5

@@ -1,0 +1,17 @@
+<div id="actions_section" class="actions">
+  <% if thesis.outline_submitted? %>
+    <%= button_to "Approve Outline & Start Research", approve_outline_thesis_path(thesis), method: :post, class: "btn" %>
+  <% end %>
+
+  <% if thesis.research_done? %>
+    <%= button_to "Start Drafting", start_drafting_thesis_path(thesis), method: :post, class: "btn" %>
+  <% end %>
+
+  <% if (thesis.drafting? || thesis.verification?) && thesis.chapters.any? { |ch| !ch.verified? && ch.draft_complete? } %>
+    <%= button_to "Start Verification", start_verification_thesis_path(thesis), method: :post, class: "btn" %>
+  <% end %>
+
+  <% if thesis.complete? %>
+    <%= link_to "Download PDF", download_pdf_thesis_path(thesis), class: "btn", data: { turbo: false } %>
+  <% end %>
+</div>

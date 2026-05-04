@@ -6,10 +6,16 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
   mount MissionControl::Jobs::Engine, at: "/jobs"
 
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
+  resources :theses, only: [ :index, :show, :new, :create, :edit, :update ] do
+    resources :chapters, only: [ :show ]
+    member do
+      post :approve_outline
+      post :start_research
+      post :start_drafting
+      post :start_verification
+      get  :download_pdf
+    end
+  end
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+  root "theses#index"
 end

@@ -1,0 +1,12 @@
+<h1>New Thesis</h1>
+<%= form_with model: @thesis do |f| %>
+  <div>
+    <%= f.label :topic %>
+    <%= f.text_area :topic, rows: 4, class: "input" %>
+  </div>
+  <div>
+    <%= f.label :cost_estimate, "Estimated cost ($)" %>
+    <%= f.number_field :cost_estimate, step: 0.01 %>
+  </div>
+  <%= f.submit "Create Thesis", class: "btn" %>
+<% end %>

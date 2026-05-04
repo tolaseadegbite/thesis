@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: serif; }
+    h1, h2, h3 { page-break-after: avoid; }
+    .chapter { page-break-before: always; }
+  </style>
+</head>
+<body>
+  <h1><%= thesis.topic %></h1>
+  <% thesis.chapters.each do |chapter| %>
+    <div class="chapter">
+      <h2><%= chapter.title %></h2>
+      <%= simple_format chapter.markdown_content %>
+    </div>
+  <% end %>
+</body>
+</html>

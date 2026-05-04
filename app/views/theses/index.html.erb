@@ -1,0 +1,7 @@
+<h1>Your Theses</h1>
+<%= link_to "New Thesis", new_thesis_path, class: "btn" %>
+<ul>
+  <% @theses.each do |thesis| %>
+    <li><%= link_to thesis.topic, thesis %> (<%= thesis.status.humanize %>)</li>
+  <% end %>
+</ul>

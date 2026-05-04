@@ -8,3 +8,78 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+ /* body {
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+} */
+
+/* .container {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+} */
+
+/* .btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: #2563eb;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+} */
+
+/* .btn:hover { background: #1d4ed8; } */
+
+/* Spinner */
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #e5e7eb;
+  border-top: 3px solid #2563eb;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-left: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+td, th {
+  border: 1px solid #e5e7eb;
+  padding: 0.5rem;
+}
+
+.actions {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.chapter {
+  border-top: 2px solid #f3f4f6;
+  margin-top: 2rem;
+  padding-top: 1rem;
+}
+
+.chapter-content {
+  background: #f9fafb;
+  padding: 1rem;
+  border-radius: 6px;
+  color: #000;
+}

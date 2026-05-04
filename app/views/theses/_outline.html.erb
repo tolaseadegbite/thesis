@@ -1,0 +1,27 @@
+<section id="outline_section">
+  <h2>Outline</h2>
+
+  <% if thesis.draft? %>
+    <p>Generating outline... <span class="spinner"></span></p>
+    <%= tag.progress class: "progress", role: "progressbar" %>
+
+  <% elsif thesis.outline.present? && thesis.outline["chapters"] %>
+    <ul>
+      <% thesis.outline["chapters"].each do |ch| %>
+        <li><strong><%= ch["title"] %></strong>
+          <ul>
+            <% ch["subsections"]&.each do |sub| %>
+              <li><%= sub %></li>
+            <% end %>
+          </ul>
+        </li>
+      <% end %>
+    </ul>
+    <% if thesis.outline_submitted? %>
+      <p><em>Awaiting your approval.</em></p>
+    <% end %>
+
+  <% else %>
+    <p><em>Outline not yet generated.</em></p>
+  <% end %>
+</section>

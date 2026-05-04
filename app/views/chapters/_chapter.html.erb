@@ -1,0 +1,9 @@
+<div id="chapter_<%= chapter.id %>" class="chapter">
+  <h3><%= chapter.title %></h3>
+  <p>Status: <%= chapter.status.humanize %></p>
+  <% if chapter.markdown_content.present? %>
+    <div class="chapter-content">
+      <%= simple_format chapter.markdown_content %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  thesis: one
+  paper: one
+  evidence_text: MyText
+  page_number: 1
+  confidence: 1.5
+
+two:
+  thesis: two
+  paper: two
+  evidence_text: MyText
+  page_number: 1
+  confidence: 1.5

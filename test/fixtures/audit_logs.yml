@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  chapter: one
+  fact: one
+  action: MyString
+  old_text: MyText
+  new_text: MyText
+  professor_notes: MyText
+
+two:
+  chapter: two
+  fact: two
+  action: MyString
+  old_text: MyText
+  new_text: MyText
+  professor_notes: MyText

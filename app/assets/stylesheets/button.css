@@ -16,6 +16,7 @@
   padding: var(--btn-padding, .375rem 1rem);
   position: relative;
   white-space: nowrap;
+  cursor: pointer;
 
   &:hover {
     background-color: var(--btn-hover-color, var(--color-border-light));

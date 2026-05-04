@@ -1,0 +1,18 @@
+<div id="thesis_<%= @thesis.id %>">
+  <h1>Topic: <%= @thesis.topic %></h1>
+  <br>
+  <hr>
+  <br>
+  <p>Status: <%= render "status", thesis: @thesis %></p>
+
+  <%= render "outline", thesis: @thesis %>
+
+  <%= render "research_progress", thesis: @thesis %>
+
+  <%= render "chapter_progress", thesis: @thesis %>
+
+  <!-- Change this part right here -->
+  <%= render "chapters_section", thesis: @thesis %>
+
+  <%= render "actions", thesis: @thesis %>
+</div>

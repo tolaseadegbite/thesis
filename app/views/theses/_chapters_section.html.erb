@@ -1,0 +1,7 @@
+<section id="chapters_section">
+  <% unless thesis.draft? || thesis.outline_submitted? %>
+    <% thesis.chapters.each do |chapter| %>
+      <%= render partial: "chapters/chapter", locals: { chapter: chapter } %>
+    <% end %>
+  <% end %>
+</section>
