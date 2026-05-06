@@ -2,6 +2,7 @@
 class Chapter < ApplicationRecord
   belongs_to :thesis
   has_many :audit_logs, dependent: :destroy
+  validates :title, presence: true
 
   enum :status, {
     pending: 0,

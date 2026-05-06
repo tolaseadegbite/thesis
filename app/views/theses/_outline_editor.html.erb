@@ -1,7 +1,8 @@
 <h2>Edit Outline</h2>
 
 <%= form_with model: thesis, url: approve_outline_thesis_path(thesis), method: :post do |f| %>
-  <div id="chapters-fields">
+  <%# Use the new form-sortable controller here %>
+  <div id="chapters-fields" data-controller="form-sortable" data-action="sortable-update->form-sortable#updateOrder">
     <%= f.fields_for :chapters do |chapter_form| %>
       <%= render "theses/chapter_fields", f: chapter_form, chapter: chapter_form.object %>
     <% end %>
