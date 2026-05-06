@@ -83,3 +83,75 @@ td, th {
   border-radius: 6px;
   color: #000;
 }
+
+.chapter-field {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+.outline-actions {
+  margin-top: 15px;
+}
+
+/* Status Badges */
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+.status-pending { background: #f3f4f6; color: #374151; }
+.status-drafting { background: #dbeafe; color: #1e40af; }
+.status-draft_complete { background: #fef3c7; color: #92400e; }
+.status-verified { background: #d1fae5; color: #065f46; }
+
+/* Professor Rejection Box */
+.professor-critique {
+  background-color: #fff7ed;
+  border: 1px solid #fdba74;
+  border-left: 4px solid #f97316;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 4px;
+  color: #9a3412;
+}
+
+.professor-critique strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: #7c2d12;
+}
+
+.professor-critique p {
+  margin: 0;
+  font-style: italic;
+}
+
+/* Professor Approval Box (Green) */
+.professor-approval {
+  background-color: #f0fdf4; /* Very light green */
+  border: 1px solid #bbf7d0;
+  border-left: 4px solid #22c55e; /* Vibrant green accent */
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 4px;
+  color: #166534; /* Dark green text */
+}
+
+.professor-approval strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: #14532d;
+}
+
+.professor-approval p {
+  margin: 0;
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+/* Ensure the chapter card feels 'locked' when verified */
+.chapter.status-verified {
+  border-color: #22c55e;
+}

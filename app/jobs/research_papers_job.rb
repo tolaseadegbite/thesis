@@ -4,7 +4,7 @@ class ResearchPapersJob < ApplicationJob
   def perform(thesis_id)
     thesis = Thesis.find(thesis_id)
 
-    # Immediately show the loading state (in case the redirect hasn't finished)
+    # 1. Immediate broadcast to show spinner
     Turbo::StreamsChannel.broadcast_replace_to(
       "thesis_#{thesis.id}",
       target: "research_section",
@@ -12,7 +12,7 @@ class ResearchPapersJob < ApplicationJob
       locals: { thesis: thesis }
     )
 
-    sleep(5)  # placeholder AI research
+    sleep(5) # Simulate AI
 
     paper = Paper.create!(
       title: "Sample Academic Paper",
@@ -26,18 +26,23 @@ class ResearchPapersJob < ApplicationJob
       paper: paper,
       evidence_text: "Microfinance increased yield by 14% in Oyo State.",
       page_number: 7,
-      confidence: 0.9
+      confidence: 0.9,
+      selected: true # Default to true so they show up checked in the review
     )
 
-    thesis.research_complete!  # sets status to research_done
+    # 2. Update status and reload to ensure the view sees the change
+    thesis.research_complete!
+    thesis.reload
 
-    # Broadcast the completed state
+    # 3. Final broadcast to show the Fact Review table
     Turbo::StreamsChannel.broadcast_replace_to(
       "thesis_#{thesis.id}",
       target: "research_section",
       partial: "theses/research_progress",
       locals: { thesis: thesis }
     )
+
+    # Also update actions section to ensure everything is in sync
     Turbo::StreamsChannel.broadcast_replace_to(
       "thesis_#{thesis.id}",
       target: "actions_section",

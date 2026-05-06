@@ -1,0 +1,30 @@
+<%# app/views/theses/_fact_review.html.erb %>
+<h2>Reference Vault (Review Facts)</h2>
+<p>✅ Research complete. <strong><%= thesis.extracted_facts.count %></strong> facts extracted.</p>
+<p>Please review and select the facts you want to include in your thesis.</p>
+
+<%= form_tag confirm_facts_thesis_path(thesis), method: :post, data: { turbo: true } do %>
+  <table>
+    <thead>
+      <tr>
+        <th width="50">Include</th>
+        <th>Paper</th>
+        <th>Evidence</th>
+        <th>Confidence</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% thesis.extracted_facts.each do |fact| %>
+        <tr>
+          <td><%= check_box_tag "fact_ids[]", fact.id, fact.selected %></td>
+          <td><%= fact.paper.citation_apa %></td>
+          <td><%= fact.evidence_text %></td>
+          <td><%= fact.confidence %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <div style="margin-top: 1rem;">
+    <%= submit_tag "Confirm Selection & Start Drafting", class: "btn btn-primary" %>
+  </div>
+<% end %>

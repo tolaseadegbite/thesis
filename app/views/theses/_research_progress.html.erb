@@ -1,26 +1,27 @@
+<%# app/views/theses/_research_progress.html.erb %>
 <section id="research_section">
   <h2>Research &amp; Facts</h2>
 
   <% if thesis.research_in_progress? %>
-    <p>
-      Researching academic papers...
-      <span class="spinner"></span>
-    </p>
+    <p>Researching academic papers... <span class="spinner"></span></p>
     <%= tag.progress class: "progress", role: "progressbar" %>
 
+  <% elsif thesis.research_done? && !thesis.fact_review_completed? %>
+    <%= render "theses/fact_review", thesis: thesis %>
+
   <% elsif (thesis.research_done? || thesis.drafting? || thesis.verification? || thesis.complete?) %>
-    <p>✅ Research complete. <strong><%= thesis.extracted_facts.count %></strong> facts extracted.</p>
+    <p>✅ Research complete. <strong><%= thesis.extracted_facts.selected.count %></strong> facts approved for use.</p>
     <%= tag.progress value: 100, max: 100, class: "progress", role: "progressbar" %>
 
-    <% if thesis.extracted_facts.any? %>
+    <% if thesis.extracted_facts.selected.any? %>
       <table>
         <thead>
           <tr><th>Paper</th><th>Evidence</th><th>Confidence</th></tr>
         </thead>
         <tbody>
-          <% thesis.extracted_facts.each do |fact| %>
+          <% thesis.extracted_facts.selected.each do |fact| %>
             <tr>
-              <td><%= fact.paper.title %></td>
+              <td><%= fact.paper.citation_apa %></td>
               <td><%= fact.evidence_text %></td>
               <td><%= fact.confidence %></td>
             </tr>
@@ -28,7 +29,6 @@
         </tbody>
       </table>
     <% end %>
-
   <% else %>
     <p>Research not yet started.</p>
   <% end %>

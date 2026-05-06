@@ -7,12 +7,14 @@ Rails.application.routes.draw do
   mount MissionControl::Jobs::Engine, at: "/jobs"
 
   resources :theses, only: [ :index, :show, :new, :create, :edit, :update ] do
-    resources :chapters, only: [ :show ]
+    resources :chapters, only: [ :destroy ]
     member do
       post :approve_outline
       post :start_research
       post :start_drafting
       post :start_verification
+      post :add_chapter
+      post :confirm_facts
       get  :download_pdf
     end
   end

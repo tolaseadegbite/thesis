@@ -1,9 +1,7 @@
 <div id="actions_section" class="actions">
-  <% if thesis.outline_submitted? %>
-    <%= button_to "Approve Outline & Start Research", approve_outline_thesis_path(thesis), method: :post, class: "btn" %>
-  <% end %>
+  <%# REMOVED: Approve Outline button (now handled by the editor form) %>
 
-  <% if thesis.research_done? %>
+  <% if thesis.research_done? && thesis.fact_review_completed? %>
     <%= button_to "Start Drafting", start_drafting_thesis_path(thesis), method: :post, class: "btn" %>
   <% end %>
 

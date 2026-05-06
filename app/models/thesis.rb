@@ -1,6 +1,10 @@
 class Thesis < ApplicationRecord
   has_many :chapters, -> { order(:order) }, dependent: :destroy
   has_many :extracted_facts, dependent: :destroy
+  accepts_nested_attributes_for :chapters, allow_destroy: true, reject_if: :all_blank
+
+  # Ensure JSON outline matches the actual Chapter records after every save
+  after_save :regenerate_outline_from_chapters!, if: -> { chapters.any?(&:saved_changes?) || saved_change_to_status? }
 
   enum :status, {
     draft: 0,
@@ -35,5 +39,22 @@ class Thesis < ApplicationRecord
 
   def finalize!
     update!(status: :complete) if verification? && chapters.all?(&:verified?)
+  end
+
+  def regenerate_outline_from_chapters!
+    existing_outline = outline || { "chapters" => [] }
+    existing_chapters = existing_outline["chapters"] || []
+
+    new_outline_data = chapters.reload.order(:order).each_with_index.map do |ch, index|
+      # Try to find by title first, then fallback to index
+      old_entry = existing_chapters.find { |ec| ec["title"] == ch.title } || existing_chapters[index]
+
+      {
+        "title" => ch.title,
+        "subsections" => old_entry ? (old_entry["subsections"] || []) : []
+      }
+    end
+
+    update_column(:outline, { "chapters" => new_outline_data })
   end
 end

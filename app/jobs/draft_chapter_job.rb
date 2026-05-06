@@ -8,11 +8,11 @@ class DraftChapterJob < ApplicationJob
 
     chapter.update!(status: :drafting)
 
-    sleep(3)  # placeholder AI
-    facts = thesis.extracted_facts.first(5)
+    sleep(3)
+    facts = thesis.extracted_facts.selected.order(:id).first(5)
     content = "# #{chapter.title}\n\n"
     facts.each do |fact|
-      content += "According to a study, #{fact.evidence_text} [Fact ID: #{fact.id}]\n\n"
+      content += "According to #{fact.paper.citation_apa}, #{fact.evidence_text} [Fact ID: #{fact.id}]\n\n"
     end
 
     chapter.update!(markdown_content: content, status: :draft_complete)

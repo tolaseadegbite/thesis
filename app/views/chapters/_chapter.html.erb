@@ -1,6 +1,36 @@
 <div id="chapter_<%= chapter.id %>" class="chapter">
-  <h3><%= chapter.title %></h3>
-  <p>Status: <%= chapter.status.humanize %></p>
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+    <h3 style="margin: 0;"><%= chapter.title %></h3>
+    <span class="status-badge status-<%= chapter.status %>">
+      <%= chapter.status.humanize %>
+    </span>
+  </div>
+
+  <%# CASE 1: Show the most recent rejection if it's currently failing/re-drafting %>
+  <% if !chapter.verified? && rejection = chapter.audit_logs.where(action: "verify_reject").last %>
+    <div class="professor-critique">
+      <strong>Professor's Feedback:</strong>
+      <p><%= rejection.professor_notes %></p>
+      <small style="display: block; margin-top: 0.5rem; opacity: 0.8;">
+        🔄 The system is automatically re-drafting this section to address the feedback.
+      </small>
+    </div>
+  <% end %>
+
+  <%# CASE 2: Show the approval note if it is verified %>
+  <% if chapter.verified? %>
+    <% approval = chapter.audit_logs.where(action: "verify_pass").last %>
+    <div class="professor-approval">
+      <div style="display: flex; gap: 8px; align-items: flex-start;">
+        <span style="font-size: 1.2rem;">✅</span>
+        <div>
+          <strong>Professor's Verification:</strong>
+          <p><%= approval&.professor_notes || "Factual claims match approved sources in the Reference Vault." %></p>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
   <% if chapter.markdown_content.present? %>
     <div class="chapter-content">
       <%= simple_format chapter.markdown_content %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_03_103027) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_04_154155) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -44,6 +44,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_03_103027) do
     t.text "evidence_text"
     t.integer "page_number"
     t.bigint "paper_id", null: false
+    t.boolean "selected", default: false, null: false
     t.bigint "thesis_id", null: false
     t.datetime "updated_at", null: false
     t.index ["paper_id"], name: "index_extracted_facts_on_paper_id"
@@ -63,6 +64,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_03_103027) do
   create_table "theses", force: :cascade do |t|
     t.float "cost_estimate"
     t.datetime "created_at", null: false
+    t.boolean "fact_review_completed", default: false, null: false
     t.jsonb "outline", default: {}
     t.integer "status", default: 0
     t.text "topic"

@@ -1,0 +1,15 @@
+<h2>Edit Outline</h2>
+
+<%= form_with model: thesis, url: approve_outline_thesis_path(thesis), method: :post do |f| %>
+  <div id="chapters-fields">
+    <%= f.fields_for :chapters do |chapter_form| %>
+      <%= render "theses/chapter_fields", f: chapter_form, chapter: chapter_form.object %>
+    <% end %>
+  </div>
+
+  <div class="outline-actions" style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+    <%= link_to "Add Chapter", add_chapter_thesis_path(thesis), 
+                data: { turbo_method: :post }, class: "btn btn-secondary" %>
+    <%= f.submit "Save Changes & Start Research", class: "btn btn-primary" %>
+  </div>
+<% end %>
