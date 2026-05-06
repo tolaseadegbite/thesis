@@ -1,19 +1,35 @@
-<div id="chapter_<%= chapter.id %>" class="chapter">
+<div id="chapter_<%= chapter.id %>" class="chapter <%= 'status-verified' if chapter.verified? %>">
+  
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-    <h3 style="margin: 0;"><%= chapter.title %></h3>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <h3 style="margin: 0;"><%= chapter.title %></h3>
+      <%# Show a tiny spinner next to the title while drafting %>
+      <% if chapter.drafting? %>
+        <span class="spinner" style="width: 14px; height: 14px; border-width: 2px;"></span>
+      <% end %>
+    </div>
     <span class="status-badge status-<%= chapter.status %>">
       <%= chapter.status.humanize %>
     </span>
   </div>
 
+  <%# THE HEARTBEAT UI %>
+  <% if chapter.drafting? && chapter.status_message.present? %>
+    <div style="margin-bottom: 1rem; color: #2563eb; font-size: 0.95rem; font-weight: 500; animation: pulse 2s infinite;">
+      ● <%= chapter.status_message %>
+    </div>
+  <% end %>
+
   <%# CASE 1: Show the most recent rejection if it's currently failing/re-drafting %>
-  <% if !chapter.verified? && rejection = chapter.audit_logs.where(action: "verify_reject").last %>
+  <% if !chapter.verified? && (rejection = chapter.audit_logs.where(action: "verify_reject").last) %>
     <div class="professor-critique">
       <strong>Professor's Feedback:</strong>
       <p><%= rejection.professor_notes %></p>
-      <small style="display: block; margin-top: 0.5rem; opacity: 0.8;">
-        🔄 The system is automatically re-drafting this section to address the feedback.
-      </small>
+      <% if chapter.drafting? %>
+        <small style="display: block; margin-top: 0.5rem; opacity: 0.8;">
+          🔄 The system is automatically re-drafting this section to address the feedback.
+        </small>
+      <% end %>
     </div>
   <% end %>
 
@@ -31,7 +47,8 @@
     </div>
   <% end %>
 
-  <% if chapter.markdown_content.present? %>
+  <%# FINAL CONTENT %>
+  <% if chapter.markdown_content.present? && !chapter.drafting? %>
     <div class="chapter-content">
       <%= simple_format chapter.markdown_content %>
     </div>

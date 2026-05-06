@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_06_173856) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_06_181929) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -32,6 +32,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_06_173856) do
     t.text "markdown_content"
     t.integer "order"
     t.integer "status", default: 0
+    t.string "status_message"
     t.jsonb "subsections"
     t.bigint "thesis_id", null: false
     t.string "title"
