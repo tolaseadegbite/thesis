@@ -1,13 +1,12 @@
-<%# 1. Handle standalone Turbo Stream requests securely %>
+<%# Robust builder for both page load and Turbo Stream appends %>
 <% 
   unless local_assigns[:f]
-    child_index = Time.now.to_i
-    # We must explicitly tell Rails this belongs inside chapters_attributes
+    # This specifically fixes the "Unpermitted parameters" bug by nesting under thesis[chapters_attributes]
     f = ActionView::Helpers::FormBuilder.new("thesis[chapters_attributes][#{child_index}]", chapter, self, {})
   end
 %>
 
-<fieldset class="chapter-field" style="border: 1px solid #ddd; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; background: #fff;">
+<fieldset class="chapter-field" data-budget-target="chapter" style="border: 1px solid #ddd; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; background: #fff;">
   <%= f.hidden_field :id if chapter.persisted? %>
 
   <div style="display: flex; gap: 1rem; align-items: flex-start;">
@@ -19,18 +18,20 @@
     <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 10px;">
       <div>
         <%= f.label :title, "Chapter Title" %>
-        <%# Notice we use the form builder 'f' %>
-        <%= f.text_field :title, placeholder: "e.g., Introduction", class: "input #{'is-invalid' if f.object.errors[:title].any?}" %>
+        <%= f.text_field :title, placeholder: "e.g., Introduction", 
+            class: "input #{'is-invalid' if f.object.errors[:title].any?}" %>
         <% if f.object.errors[:title].any? %>
-          <small style="color: #dc2626;">Chapter title cannot be blank</small>
+          <div style="color: #dc2626; font-size: 0.85rem; margin-top: 4px;">Chapter title cannot be blank</div>
         <% end %>
       </div>
+      
       <div>
         <%= f.label :subsections_string, "Subsections (comma separated)" %>
         <%= f.text_area :subsections_string, class: "input", rows: 2, placeholder: "Background, Methodology..." %>
       </div>
     </div>
 
+    <%# Hidden so drag-and-drop handles the value, but Rails still receives the data %>
     <%= f.hidden_field :order, class: "order-input" %>
 
     <div style="margin-top: 1.5rem;">

@@ -1,7 +1,29 @@
-<h2>Edit Outline</h2>
+<h2>Edit Outline & Budget</h2>
 
-<%= form_with model: thesis, url: approve_outline_thesis_path(thesis), method: :post do |f| %>
-  <%# Use the new form-sortable controller here %>
+<%# 1. Attach the budget controller and pass the ruby constants as data values %>
+<%= form_with model: thesis, url: approve_outline_thesis_path(thesis), method: :post, 
+    data: { 
+      controller: "budget", 
+      budget_paper_cost_value: Thesis::COST_PER_PAPER,
+      budget_chapter_cost_value: Thesis::COST_PER_CHAPTER,
+      action: "sortable-update->budget#calculate" 
+    } do |f| %>
+  
+  <%# 2. The Dynamic Budget Panel %>
+  <div class="budget-panel">
+    <strong>Scope & Budget Estimate:</strong><br>
+    Deep Researcher should fetch up to 
+    <%= f.number_field :target_paper_count, 
+          class: "input", 
+          style: "width: 80px; display: inline-block; margin: 0 5px;", 
+          min: 1, max: 100, 
+          data: { budget_target: "paperCount", action: "input->budget#calculate" } %> 
+    papers.<br>
+    <span style="display: inline-block; margin-top: 8px;">
+      Estimated compute cost for Research + Drafting: <strong>$<span data-budget-target="costDisplay"><%= format('%.2f', thesis.calculate_cost_estimate) %></span></strong>
+    </span>
+  </div>
+
   <div id="chapters-fields" data-controller="form-sortable" data-action="sortable-update->form-sortable#updateOrder">
     <%= f.fields_for :chapters do |chapter_form| %>
       <%= render "theses/chapter_fields", f: chapter_form, chapter: chapter_form.object %>

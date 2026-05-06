@@ -1,7 +1,7 @@
 class ThesesController < ApplicationController
   before_action :set_thesis, only: %i[show edit update approve_outline
-                                    start_research start_drafting start_verification
-                                    download_pdf add_chapter confirm_facts]
+                                      start_research start_drafting start_verification
+                                      download_pdf add_chapter confirm_facts]
 
   def index
     @theses = Thesis.order(created_at: :desc)
@@ -34,13 +34,18 @@ class ThesesController < ApplicationController
   end
 
   def approve_outline
-    # Only try to update if the 'thesis' key is present in params
+    # 1. Prepare status changes in memory before saving
+    @thesis.status = :research_in_progress
+    @thesis.fact_review_completed = false
+
+    # 2. Safety guard check
     success = params[:thesis].present? ? @thesis.update(thesis_params) : true
 
     if success
-      @thesis.regenerate_outline_from_chapters!
-      @thesis.approve_outline!
-      @thesis.update!(status: :research_in_progress)
+      # 3. Lock in the final cost (the JSON outline now syncs automatically in the model!)
+      @thesis.update_column(:cost_estimate, @thesis.calculate_cost_estimate)
+      @thesis.approve_outline! # This handles the 'outline_approved' state logic
+
       ResearchPapersJob.perform_later(@thesis.id)
 
       render turbo_stream: [
@@ -128,9 +133,12 @@ class ThesesController < ApplicationController
   def add_chapter
     @chapter = @thesis.chapters.build(order: @thesis.chapters.size)
 
+    # FIX: Microsecond timestamp ensures unique IDs even if clicking fast
+    child_index = Time.now.to_f.to_s.gsub(".", "")
+
     render turbo_stream: turbo_stream.append("chapters-fields",
       partial: "theses/chapter_fields",
-      locals: { thesis: @thesis, chapter: @chapter })
+      locals: { thesis: @thesis, chapter: @chapter, child_index: child_index })
   end
 
   private
@@ -140,7 +148,7 @@ class ThesesController < ApplicationController
   end
 
   def thesis_params
-    params.require(:thesis).permit(:topic, :cost_estimate,
-      chapters_attributes: [ :id, :title, :order, :_destroy, :subsections_string ])
+    params.require(:thesis).permit(:topic, :target_paper_count, :cost_estimate,
+      chapters_attributes: [ :id, :title, :order, :subsections_string, :_destroy ])
   end
 end
