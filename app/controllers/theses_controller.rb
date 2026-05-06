@@ -140,8 +140,7 @@ class ThesesController < ApplicationController
   end
 
   def thesis_params
-    # We must permit chapters_attributes and the _destroy flag
     params.require(:thesis).permit(:topic, :cost_estimate,
-      chapters_attributes: [ :id, :title, :order, :_destroy ])
+      chapters_attributes: [ :id, :title, :order, :_destroy, :subsections_string ])
   end
 end

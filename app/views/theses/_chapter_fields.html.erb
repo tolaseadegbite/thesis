@@ -1,19 +1,20 @@
-<%# If f is not passed (e.g. from the add_chapter stream), we create a standalone builder %>
-<% 
-  unless local_assigns[:f]
-    child_index = Time.now.to_i
-    f = ActionView::Helpers::FormBuilder.new("thesis[chapters_attributes][#{child_index}]", chapter, self, {})
-  end
-%>
+<% f ||= ActionView::Helpers::FormBuilder.new(:thesis, chapter, self, {}) %>
+<% child_index ||= nil %>
 
 <fieldset class="chapter-field" style="border: 1px solid #ddd; padding: 1rem; margin-bottom: 1rem; border-radius: 8px;">
-  <%# 1. ID is required for existing records to be updated instead of created new %>
   <%= f.hidden_field :id if chapter.persisted? %>
 
-  <div style="display: grid; grid-template-columns: 1fr 100px auto; gap: 1rem; align-items: end;">
-    <div>
-      <%= f.label :title, "Chapter Title" %>
-      <%= f.text_field :title, class: "input", placeholder: "e.g., Introduction" %>
+  <div style="display: grid; grid-template-columns: 1fr 100px auto; gap: 1rem; align-items: start;">
+    
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <div>
+        <%= f.label :title, "Chapter Title" %>
+        <%= f.text_field :title, class: "input", placeholder: "e.g., Introduction" %>
+      </div>
+      <div>
+        <%= f.label :subsections_string, "Subsections (comma separated)" %>
+        <%= f.text_area :subsections_string, class: "input", rows: 2, placeholder: "Background, Methodology..." %>
+      </div>
     </div>
 
     <div>
@@ -23,7 +24,6 @@
 
     <div>
       <% if chapter.persisted? %>
-        <%# 2. _destroy must be at the same level as title and order %>
         <%= f.hidden_field :_destroy, value: 0, class: "destroy-flag" %>
         <button type="button" class="btn btn-danger" 
                 onclick="this.previousElementSibling.value = '1'; this.closest('fieldset').style.display = 'none'">
@@ -35,5 +35,6 @@
         </button>
       <% end %>
     </div>
+
   </div>
 </fieldset>

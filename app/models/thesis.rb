@@ -42,16 +42,10 @@ class Thesis < ApplicationRecord
   end
 
   def regenerate_outline_from_chapters!
-    existing_outline = outline || { "chapters" => [] }
-    existing_chapters = existing_outline["chapters"] || []
-
-    new_outline_data = chapters.reload.order(:order).each_with_index.map do |ch, index|
-      # Try to find by title first, then fallback to index
-      old_entry = existing_chapters.find { |ec| ec["title"] == ch.title } || existing_chapters[index]
-
+    new_outline_data = chapters.reload.order(:order).map do |ch|
       {
         "title" => ch.title,
-        "subsections" => old_entry ? (old_entry["subsections"] || []) : []
+        "subsections" => ch.subsections ||[]
       }
     end
 

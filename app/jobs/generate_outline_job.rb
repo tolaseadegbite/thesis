@@ -3,24 +3,30 @@ class GenerateOutlineJob < ApplicationJob
 
   def perform(thesis_id)
     thesis = Thesis.find(thesis_id)
+    sleep(2) # Placeholder for AI
 
-    sleep(2)
-
+    # 1. Dummy Data with Subsections
     outline = {
       chapters: [
         { title: "Introduction", subsections: [ "Background", "Problem Statement", "Objectives" ] },
         { title: "Literature Review", subsections: [ "Theoretical Framework", "Empirical Studies" ] },
-        { title: "Methodology", subsections: [ "Research Design", "Data Collection" ] },
-        { title: "Discussion", subsections: [ "Analysis", "Findings" ] },
-        { title: "Conclusion", subsections: [ "Summary", "Recommendations" ] }
+        { title: "Methodology", subsections: [ "Research Design", "Data Collection", "Data Analysis" ] },
+        { title: "Discussion", subsections: [ "Analysis of Findings", "Comparison with Previous Work" ] },
+        { title: "Conclusion", subsections: [ "Summary", "Recommendations", "Future Work" ] }
       ]
     }
 
     thesis.transaction do
       thesis.update!(outline: outline, status: :outline_submitted)
 
+      # 2. Save the subsections directly to each chapter record
       outline[:chapters].each_with_index do |chap, idx|
-        thesis.chapters.create!(title: chap[:title], order: idx, status: :pending)
+        thesis.chapters.create!(
+          title: chap[:title],
+          order: idx,
+          status: :pending,
+          subsections: chap[:subsections] # <--- This is the crucial part
+        )
       end
     end
 
