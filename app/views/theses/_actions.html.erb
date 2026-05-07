@@ -1,14 +1,23 @@
 <div id="actions_section" class="actions">
-  <%# REMOVED: Approve Outline button (now handled by the editor form) %>
-
+  <%# 1. Start Drafting button %>
   <% if thesis.research_done? && thesis.fact_review_completed? %>
     <%= button_to "Start Drafting", start_drafting_thesis_path(thesis), method: :post, class: "btn" %>
   <% end %>
 
-  <% if (thesis.drafting? || thesis.verification?) && thesis.chapters.any? { |ch| !ch.verified? && ch.draft_complete? } %>
-    <%= button_to "Start Verification", start_verification_thesis_path(thesis), method: :post, class: "btn" %>
+  <%# 2. Start Verification Form (shows when all chapters are draft_complete) %>
+  <% if (thesis.drafting? || thesis.verification?) && thesis.chapters.all?(&:draft_complete?) && thesis.chapters.any? { |ch| !ch.verified? } %>
+    <%= form_with url: start_verification_thesis_path(thesis), method: :post, class: "verification-form" do |f| %>
+      <div class="depth-selector" style="margin-bottom: 1rem;">
+        <strong>Verification Depth:</strong>
+        <label style="margin-left: 10px;"><input type="radio" name="depth" value="strict"> Strict</label>
+        <label style="margin-left: 10px;"><input type="radio" name="depth" value="moderate" checked> Moderate</label>
+        <label style="margin-left: 10px;"><input type="radio" name="depth" value="light"> Light</label>
+      </div>
+      <%= f.submit "Start Verification", class: "btn" %>
+    <% end %>
   <% end %>
 
+  <%# 3. Download button %>
   <% if thesis.complete? %>
     <%= link_to "Download PDF", download_pdf_thesis_path(thesis), class: "btn", data: { turbo: false } %>
   <% end %>

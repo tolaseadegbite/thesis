@@ -1,1 +1,6 @@
-<span id="thesis_status"><%= thesis.status.humanize %></span>
+<span id="thesis_status">
+  <%= thesis.status.humanize %> 
+  <% if thesis.verification? %>
+    (<%= thesis.verification_depth.capitalize %> Mode)
+  <% end %>
+</span>

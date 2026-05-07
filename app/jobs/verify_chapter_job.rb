@@ -4,6 +4,10 @@ class VerifyChapterJob < ApplicationJob
   def perform(chapter_id)
     chapter = Chapter.find(chapter_id)
     thesis = chapter.thesis
+
+    # Log this so you can verify it in your terminal
+    Rails.logger.info "--- PROFESSOR GRADED CHAPTER: #{chapter.title} | DEPTH: #{thesis.verification_depth.upcase} ---"
+
     thesis.start_verification! if thesis.drafting?
 
     sleep(2)  # placeholder AI verification

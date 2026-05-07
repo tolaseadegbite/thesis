@@ -53,8 +53,13 @@ class Thesis < ApplicationRecord
     update!(status: :drafting) if research_done?
   end
 
-  def start_verification!
-    update!(status: :verification) if drafting? && chapters.all?(&:draft_complete?)
+  def start_verification!(depth = nil)
+    return unless drafting? && chapters.all?(&:draft_complete?)
+
+    # Update both status and depth in a single database call
+    attrs = { status: :verification }
+    attrs[:verification_depth] = depth if depth.present?
+    update!(attrs)
   end
 
   def finalize!

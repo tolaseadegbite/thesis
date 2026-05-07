@@ -90,10 +90,11 @@ class ThesesController < ApplicationController
   end
 
   def start_verification
-    @thesis.chapters.each { |chapter| VerifyChapterJob.perform_later(chapter.id) }
-    @thesis.start_verification!
+    # Pass the depth parameter directly to the model method
+    @thesis.start_verification!(params[:depth])
 
-    # Instantly transition the progress bar to "Verifying" and remove the start button
+    @thesis.chapters.each { |chapter| VerifyChapterJob.perform_later(chapter.id) }
+
     render turbo_stream: [
       turbo_stream.replace("thesis_status", partial: "theses/status", locals: { thesis: @thesis }),
       turbo_stream.replace("chapter_progress", partial: "theses/chapter_progress", locals: { thesis: @thesis }),
