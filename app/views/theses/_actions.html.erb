@@ -19,6 +19,21 @@
 
   <%# 3. Download button %>
   <% if thesis.complete? %>
-    <%= link_to "Download PDF", download_pdf_thesis_path(thesis), class: "btn", data: { turbo: false } %>
+    <% if thesis.pdf_none? %>
+      <%= button_to "Assemble Final PDF", generate_pdf_thesis_path(thesis), method: :post, class: "btn" %>
+    
+    <% elsif thesis.pdf_generating? %>
+      <button class="btn" disabled style="opacity: 0.7; cursor: wait;">
+        <span class="spinner" style="width: 12px; height: 12px; border-width: 2px; margin-right: 8px;"></span>
+        Assembling Chapters...
+      </button>
+
+    <% elsif thesis.pdf_ready? %>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <p style="color: #059669; font-weight: bold; margin: 0;">✨ Thesis Ready for Download</p>
+        <%= link_to "Download PDF Now", download_pdf_thesis_path(thesis), class: "btn", data: { turbo: false } %>
+        <%= button_to "Re-generate PDF", generate_pdf_thesis_path(thesis), method: :post, style: "background: none; border: none; color: #6b7280; text-decoration: underline; cursor: pointer; font-size: 0.8rem;" %>
+      </div>
+    <% end %>
   <% end %>
 </div>

@@ -17,6 +17,8 @@ class Thesis < ApplicationRecord
     complete: 7
   }
 
+  enum :pdf_status, { pdf_none: 0, pdf_generating: 1, pdf_ready: 2 }
+
   # --- PRICING CONSTANTS ---
   COST_PER_PAPER = 0.01
   COST_PER_CHAPTER = 0.02

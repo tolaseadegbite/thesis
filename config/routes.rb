@@ -15,6 +15,7 @@ Rails.application.routes.draw do
       post :start_verification
       post :add_chapter
       post :confirm_facts
+      post :generate_pdf
       get  :download_pdf
     end
   end

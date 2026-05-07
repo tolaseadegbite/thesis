@@ -1,7 +1,7 @@
 class ThesesController < ApplicationController
   before_action :set_thesis, only: %i[show edit update approve_outline
                                       start_research start_drafting start_verification
-                                      download_pdf add_chapter confirm_facts]
+                                      download_pdf add_chapter confirm_facts generate_pdf]
 
   def index
     @theses = Thesis.order(created_at: :desc)
@@ -124,10 +124,17 @@ class ThesesController < ApplicationController
     ]
   end
 
+  def generate_pdf
+    GeneratePdfJob.perform_later(@thesis.id)
+
+    # Return an immediate stream to show the loading state
+    render turbo_stream: turbo_stream.replace("actions_section", partial: "theses/actions", locals: { thesis: @thesis })
+  end
+
   def download_pdf
+    # Logic to send the file (e.g., from ActiveStorage or re-rendering)
     pdf_html = render_to_string(template: "theses/pdf", locals: { thesis: @thesis })
-    pdf = FerrumPdf.render_pdf(html: pdf_html,
-                               pdf_options: { paper_width: 8.5, paper_height: 11 })
+    pdf = FerrumPdf.render_pdf(html: pdf_html, pdf_options: { paper_width: 8.5, paper_height: 11 })
     send_data pdf, filename: "#{@thesis.topic.parameterize}.pdf", type: :pdf
   end
 
