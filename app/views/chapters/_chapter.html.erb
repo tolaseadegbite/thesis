@@ -3,8 +3,8 @@
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
     <div style="display: flex; align-items: center; gap: 10px;">
       <h3 style="margin: 0;"><%= chapter.title %></h3>
-      <%# Show a tiny spinner next to the title while drafting %>
-      <% if chapter.drafting? %>
+      <%# Show spinner for any active background process %>
+      <% if chapter.drafting? || (chapter.thesis.verification? && !chapter.verified?) %>
         <span class="spinner" style="width: 14px; height: 14px; border-width: 2px;"></span>
       <% end %>
     </div>
@@ -13,27 +13,27 @@
     </span>
   </div>
 
-  <%# THE HEARTBEAT UI %>
-  <% if chapter.drafting? && chapter.status_message.present? %>
+  <%# HEARTBEAT MESSAGE %>
+  <% if chapter.status_message.present? %>
     <div style="margin-bottom: 1rem; color: #2563eb; font-size: 0.95rem; font-weight: 500; animation: pulse 2s infinite;">
       ● <%= chapter.status_message %>
     </div>
   <% end %>
 
-  <%# CASE 1: Show the most recent rejection if it's currently failing/re-drafting %>
+  <%# REJECTION BOX %>
   <% if !chapter.verified? && (rejection = chapter.audit_logs.where(action: "verify_reject").last) %>
     <div class="professor-critique">
       <strong>Professor's Feedback:</strong>
       <p><%= rejection.professor_notes %></p>
       <% if chapter.drafting? %>
         <small style="display: block; margin-top: 0.5rem; opacity: 0.8;">
-          🔄 The system is automatically re-drafting this section to address the feedback.
+          🔄 AI is currently revising this section based on the notes above.
         </small>
       <% end %>
     </div>
   <% end %>
 
-  <%# CASE 2: Show the approval note if it is verified %>
+  <%# APPROVAL BOX %>
   <% if chapter.verified? %>
     <% approval = chapter.audit_logs.where(action: "verify_pass").last %>
     <div class="professor-approval">
@@ -41,16 +41,15 @@
         <span style="font-size: 1.2rem;">✅</span>
         <div>
           <strong>Professor's Verification:</strong>
-          <p><%= approval&.professor_notes || "Factual claims match approved sources in the Reference Vault." %></p>
+          <p><%= approval&.professor_notes || "Factual alignment confirmed." %></p>
         </div>
       </div>
     </div>
   <% end %>
 
-  <%# FINAL CONTENT %>
   <% if chapter.markdown_content.present? && !chapter.drafting? %>
     <div class="chapter-content">
-      <%= simple_format chapter.markdown_content %>
+      <%= markdown(chapter.resolved_markdown) %>
     </div>
   <% end %>
 </div>

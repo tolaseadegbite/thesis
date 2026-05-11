@@ -5,7 +5,7 @@ class GeneratePdfJob < ApplicationJob
     thesis = Thesis.find(thesis_id)
     thesis.pdf_generating!
 
-    # 1. Immediate broadcast to show "Generating PDF..." spinner
+    # 1. Immediate broadcast to show "Assembling Chapters..." spinner
     Turbo::StreamsChannel.broadcast_replace_to(
       "thesis_#{thesis.id}",
       target: "actions_section",
@@ -13,17 +13,14 @@ class GeneratePdfJob < ApplicationJob
       locals: { thesis: thesis }
     )
 
-    # 2. Simulate PDF Generation Time (Ferrum logic)
+    # 2. Simulate PDF Generation Time
+    # (Ferrum logic is currently handled in the controller's download_pdf action)
     sleep(4)
 
-    # In a real app, you would save this to S3 via ActiveStorage:
-    # pdf_html = ApplicationController.render(template: "theses/pdf", locals: { thesis: thesis })
-    # pdf = FerrumPdf.render_pdf(html: pdf_html)
-    # thesis.pdf_file.attach(io: StringIO.new(pdf), filename: "thesis.pdf")
-
+    # 3. Finalize state
     thesis.pdf_ready!
 
-    # 3. Final broadcast to show the "Download Now" link
+    # 4. Final broadcast to show the "Download PDF Now" button
     Turbo::StreamsChannel.broadcast_replace_to(
       "thesis_#{thesis.id}",
       target: "actions_section",

@@ -172,3 +172,87 @@ td, th {
   font-style: italic;
   border-radius: 0 4px 4px 0;
 }
+
+/* --- ACADEMIC CONTENT STYLING --- */
+.chapter-content {
+  background: #ffffff; /* Clean white for better reading */
+  padding: 2.5rem;
+  border-radius: 8px;
+  color: #1f2937;
+  line-height: 1.8;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Headers: Explicitly bold and sized */
+.chapter-content h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: #111827;
+  border-bottom: 2px solid #f3f4f6;
+  padding-bottom: 0.5rem;
+}
+
+.chapter-content h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  color: #111827;
+}
+
+.chapter-content h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: #374151;
+}
+
+/* Paragraphs */
+.chapter-content p {
+  margin-bottom: 1.5rem;
+  text-align: justify;
+}
+
+/* Bold and Italic */
+.chapter-content strong {
+  font-weight: 700;
+  color: #000;
+}
+
+.chapter-content em {
+  font-style: italic;
+  color: #4b5563;
+}
+
+/* Lists: Explicitly adding markers back */
+.chapter-content ul {
+  list-style-type: disc !important;
+  margin-bottom: 1.5rem;
+  padding-left: 2rem;
+}
+
+.chapter-content ol {
+  list-style-type: decimal !important;
+  margin-bottom: 1.5rem;
+  padding-left: 2rem;
+}
+
+.chapter-content li {
+  margin-bottom: 0.5rem;
+  display: list-item; /* Ensures the bullet/number shows */
+}
+
+/* Blockquotes (Corrections) */
+.chapter-content blockquote {
+  border-left: 4px solid #3b82f6;
+  background-color: #eff6ff;
+  margin: 1.5rem 0;
+  padding: 1rem 1.5rem;
+  color: #1e3a8a;
+  font-style: italic;
+  border-radius: 0 4px 4px 0;
+}

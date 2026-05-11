@@ -132,8 +132,9 @@ class ThesesController < ApplicationController
   end
 
   def download_pdf
-    # Logic to send the file (e.g., from ActiveStorage or re-rendering)
-    pdf_html = render_to_string(template: "theses/pdf", locals: { thesis: @thesis })
+    # ADD layout: false HERE so it doesn't wrap the PDF in your web layout
+    pdf_html = render_to_string(template: "theses/pdf", layout: false, locals: { thesis: @thesis })
+
     pdf = FerrumPdf.render_pdf(html: pdf_html, pdf_options: { paper_width: 8.5, paper_height: 11 })
     send_data pdf, filename: "#{@thesis.topic.parameterize}.pdf", type: :pdf
   end

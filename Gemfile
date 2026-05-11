@@ -70,3 +70,5 @@ gem "css-zero", "~> 3.2", github: "lazaronixon/css-zero"
 gem "aws-sdk-s3"
 gem "mission_control-jobs"
 gem "ferrum_pdf"
+
+gem "kramdown", "~> 2.5"

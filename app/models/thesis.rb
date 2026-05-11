@@ -3,8 +3,10 @@ class Thesis < ApplicationRecord
   has_many :extracted_facts, dependent: :destroy
   accepts_nested_attributes_for :chapters, allow_destroy: true, reject_if: :all_blank
 
-  # Only sync JSON outline once the entire transaction is finished
-  after_commit :sync_outline_cache, on: [ :create, :update ], if: -> { chapters.any? }
+  # Only sync the JSON cache if the status changed or chapter titles/subsections changed.
+  # We check 'saved_changes?' on chapters to avoid syncing when only 'status_message' (heartbeat) changes.
+  after_commit :sync_outline_cache, on: [ :create, :update ], 
+               if: -> { chapters.any? && (saved_change_to_status? || chapters.any? { |c| c.saved_changes.keys.intersect?(["title", "subsections"]) }) }
 
   enum :status, {
     draft: 0,
@@ -17,6 +19,8 @@ class Thesis < ApplicationRecord
     complete: 7
   }
 
+  # Ensure pdf_status has a default in the model to avoid 'Undeclared attribute' errors
+  attribute :pdf_status, :integer, default: 0
   enum :pdf_status, { pdf_none: 0, pdf_generating: 1, pdf_ready: 2 }
 
   # --- PRICING CONSTANTS ---
@@ -31,10 +35,10 @@ class Thesis < ApplicationRecord
   end
 
   def sync_outline_cache
-    # Use update_column to avoid triggering another commit cycle
     new_outline_data = chapters.order(:order).map do |ch|
       { "title" => ch.title, "subsections" => ch.subsections || [] }
     end
+    # Use update_column to bypass callbacks and prevent loops
     update_column(:outline, { "chapters" => new_outline_data })
   end
 
@@ -58,7 +62,6 @@ class Thesis < ApplicationRecord
   def start_verification!(depth = nil)
     return unless drafting? && chapters.all?(&:draft_complete?)
 
-    # Update both status and depth in a single database call
     attrs = { status: :verification }
     attrs[:verification_depth] = depth if depth.present?
     update!(attrs)

@@ -1,19 +1,61 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <style>
-    body { font-family: serif; }
-    h1, h2, h3 { page-break-after: avoid; }
-    .chapter { page-break-before: always; }
+    /* Prevent web UI elements from showing in PDF */
+    a, .status-badge, .spinner, #thesis_status { display: none !important; }
+
+    body { 
+      font-family: "Times New Roman", Times, serif; 
+      line-height: 1.6; 
+      padding: 0.75in; /* Standard academic margin */
+      color: #000;
+      background: #fff;
+      /* Prevent single lines of text at top/bottom of pages */
+      orphans: 3;
+      widows: 3;
+    }
+    
+    h1.title-page-head { 
+      text-align: center; 
+      margin-top: 3in; 
+      font-size: 26pt; 
+      text-transform: uppercase;
+    }
+
+    .chapter-wrapper { 
+      page-break-before: always; 
+      text-align: justify;
+    }
+    
+    /* Ensure the bibliography starts on its own page */
+    .references-section { page-break-before: always; }
+    .references-section li { 
+      margin-bottom: 0.8rem; 
+      padding-left: 0.5in; 
+      text-indent: -0.5in; 
+      line-height: 1.4;
+    }
   </style>
 </head>
 <body>
-  <h1><%= thesis.topic %></h1>
-  <% thesis.chapters.each do |chapter| %>
-    <div class="chapter">
-      <h2><%= chapter.title %></h2>
-      <%= simple_format chapter.markdown_content %>
+  <h1 class="title-page-head"><%= thesis.topic %></h1>
+
+  <% thesis.chapters.order(:order).each do |chapter| %>
+    <div class="chapter-wrapper">
+      <%= markdown(chapter.resolved_markdown) %>
     </div>
   <% end %>
+
+  <div class="references-section">
+    <h2>References</h2>
+    <ul>
+      <% cited_papers = thesis.extracted_facts.selected.map(&:paper).uniq.sort_by(&:citation_apa) %>
+      <% cited_papers.each do |paper| %>
+        <li><%= paper.citation_apa %></li>
+      <% end %>
+    </ul>
+  </div>
 </body>
 </html>

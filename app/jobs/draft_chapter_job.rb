@@ -1,69 +1,63 @@
-# app/jobs/draft_chapter_job.rb
 class DraftChapterJob < ApplicationJob
   queue_as :default
 
+  # Limit to 3 to match Modal's max_containers=3 for the L40S Drafter
+  limits_concurrency to: 3, key: "drafter_gpu_queue"
+
   def perform(chapter_id)
     chapter = Chapter.find(chapter_id)
-    thesis = chapter.thesis
+    thesis  = chapter.thesis
 
+    # Trigger macro status change
     thesis.start_drafting! if thesis.research_done?
 
     # --- 1. INITIALIZE HEARTBEAT ---
-    # Check if this is a first draft or a correction based on the AuditLog
     latest_rejection = chapter.audit_logs.where(action: "verify_reject").last
     is_correction = latest_rejection.present?
 
     if is_correction
-      update_heartbeat(chapter, "Reading Professor's feedback...")
-      sleep(1)
-      update_heartbeat(chapter, "Re-evaluating Fact IDs against the critique...")
-      sleep(2)
-      update_heartbeat(chapter, "Re-writing paragraph to address hallucinations...")
-      sleep(2)
+      update_heartbeat(chapter, "Applying corrections based on Professor feedback...")
     else
-      # Standard First Draft Loop
-      update_heartbeat(chapter, "Initializing AI Drafter...")
-      sleep(1)
-
-      subsections = chapter.subsections ||[]
-      if subsections.any?
-        subsections.each_with_index do |sub, index|
-          update_heartbeat(chapter, "Writing section #{index + 1}/#{subsections.size}: #{sub}...")
-          sleep(2)
-        end
-      else
-        update_heartbeat(chapter, "Synthesizing research facts...")
-        sleep(3)
-      end
+      update_heartbeat(chapter, "Initializing AI Drafter for #{chapter.subsections.size} subsections...")
     end
 
-    # --- 3. FINALIZING ---
-    update_heartbeat(chapter, "Formatting citations and reviewing tone...")
-    sleep(1)
+    # --- 2. GATHER FACTS ---
+    # Only send evidence approved by the user in Step #2
+    facts = thesis.extracted_facts.selected.pluck(:evidence_text)
 
-    # --- GENERATE CONTENT ---
-    if is_correction
-      # Simulate fixing the document
-      content = chapter.markdown_content + "\n\n> **[AI Correction Applied]**: Fixed hallucination regarding statistic. Updated to reflect correct finding based on Professor's notes: *\"#{latest_rejection.professor_notes}\"*."
-    else
-      # Standard initial generation
-      facts = thesis.extracted_facts.selected.order(:id).first(5)
-      content = "# #{chapter.title}\n\n"
-      facts.each do |fact|
-        content += "According to #{fact.paper.citation_apa}, #{fact.evidence_text}[Fact ID: #{fact.id}]\n\n"
-      end
+    # --- 3. CALL MODAL GPU ---
+    begin
+      # If it's a correction, we send the previous content and the notes to the model
+      response = ModalApiClient.new.draft_chapter(
+        title:            chapter.title,
+        subsections:      chapter.subsections || [],
+        facts:            facts,
+        previous_draft:   is_correction ? chapter.markdown_content : nil,
+        correction_notes: is_correction ? latest_rejection.professor_notes : nil
+      )
+      content = response["content"]
+    rescue => e
+      update_heartbeat(chapter, "Connection error. Retrying draft...")
+      raise e # Solid Queue will retry automatically
     end
 
-    # --- 4. SAVE COMPLETE CONTENT & CLEAR HEARTBEAT ---
-    chapter.update!(markdown_content: content, status: :draft_complete, status_message: nil)
+    # --- 4. FINALIZE & CLEAR HEARTBEAT ---
+    chapter.update!(
+      markdown_content: content,
+      status: :draft_complete,
+      status_message: nil # Remove heartbeat text on completion
+    )
 
+    # Broadcast updated chapter (now showing markdown)
     broadcast_chapter(chapter)
 
-    # If the thesis is in verification, it must go back to the Professor to check the fix
+    # --- 5. THE DEBATE LOOP ---
+    # If the thesis is already in verification mode, immediately ask the professor to check the fix
     if thesis.verification?
       VerifyChapterJob.perform_later(chapter.id)
     end
 
+    # --- 6. UPDATE GLOBAL PROGRESS ---
     Turbo::StreamsChannel.broadcast_replace_to(
       "thesis_#{thesis.id}",
       target: "chapter_progress",
@@ -71,6 +65,7 @@ class DraftChapterJob < ApplicationJob
       locals: { thesis: thesis }
     )
 
+    # If all chapters are done, show the "Start Verification" button
     if thesis.chapters.all?(&:draft_complete?) && thesis.drafting?
       Turbo::StreamsChannel.broadcast_replace_to(
         "thesis_#{thesis.id}",
@@ -84,7 +79,8 @@ class DraftChapterJob < ApplicationJob
   private
 
   def update_heartbeat(chapter, message)
-    chapter.update!(status: :drafting, status_message: message)
+    # update_columns bypasses model callbacks to prevent infinite loops with the Thesis outline cache
+    chapter.update_columns(status: 1, status_message: message)
     broadcast_chapter(chapter)
   end
 
